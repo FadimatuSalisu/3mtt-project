@@ -1,0 +1,210 @@
+import pandas as pd
+
+# Load the dataset
+df = pd.read_csv('/content/country_wise_latest.csv')
+
+# Display dataset info
+print("Dataset Shape:", df.shape)
+print("\nColumn Names:", df.columns)
+print("\nMissing Values per Column:")
+print(df.isnull().sum())
+
+# Basic descriptive statistics for numeric columns
+print("\nDescriptive Statistics:")
+print(df.describe())
+print("Column Names:")
+print(df.columns)
+# Standardize column names
+df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_").str.replace("/", "_")
+print("Standardized Column Names:")
+print(df.columns)
+if 'confirmed' in df.columns:
+    sns.histplot(df['confirmed'], bins=30, kde=True, color='blue')
+    plt.title('Distribution of Confirmed Cases')
+    plt.xlabel('Confirmed Cases')
+    plt.ylabel('Frequency')
+    plt.show()
+else:
+    print("The column 'confirmed' does not exist in the dataset. Please verify the column name.")
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Distribution of Confirmed Cases
+plt.figure(figsize=(10, 6))
+sns.histplot(df['confirmed'], bins=30, kde=True, color='blue')
+plt.title('Distribution of Confirmed Cases')
+plt.xlabel('Confirmed Cases')
+plt.ylabel('Frequency')
+plt.show()
+
+# Distribution of Deaths per 100 Cases
+plt.figure(figsize=(10, 6))
+sns.histplot(df['deaths___100_cases'], bins=30, kde=True, color='red')
+plt.title('Distribution of Deaths per 100 Cases')
+plt.xlabel('Deaths per 100 Cases')
+plt.ylabel('Frequency')
+plt.show()
+
+# Distribution of Recovered per 100 Cases
+plt.figure(figsize=(10, 6))
+sns.histplot(df['recovered___100_cases'], bins=30, kde=True, color='green')
+plt.title('Distribution of Recovered per 100 Cases')
+plt.xlabel('Recovered per 100 Cases')
+plt.ylabel('Frequency')
+plt.show()
+# Select only numeric columns
+numeric_df = df.select_dtypes(include=['float64', 'int64'])
+
+# Check the columns being used
+print("Numeric Columns for Correlation:")
+print(numeric_df.columns)
+# Correlation Heatmap for Numeric Columns
+plt.figure(figsize=(12, 8))
+correlation_matrix = numeric_df.corr()
+sns.heatmap(correlation_matrix, annot=True, fmt=".2f", cmap="coolwarm")
+plt.title('Correlation Matrix')
+plt.show()
+# Pairplot for key numeric variables
+sns.pairplot(df[['confirmed', 'deaths', 'recovered', 'new_cases', '1_week_%_increase']])
+plt.suptitle('Pairwise Relationships', y=1.02)
+plt.show()
+
+# Scatter Plot: Confirmed vs Deaths
+plt.figure(figsize=(10, 6))
+sns.scatterplot(x='confirmed', y='deaths', data=df, alpha=0.7)
+plt.title('Confirmed Cases vs Deaths')
+plt.xlabel('Confirmed Cases')
+plt.ylabel('Deaths')
+plt.show()
+
+# Scatter Plot: Confirmed vs Recovered
+plt.figure(figsize=(10, 6))
+sns.scatterplot(x='confirmed', y='recovered', data=df, alpha=0.7, color='green')
+plt.title('Confirmed Cases vs Recovered')
+plt.xlabel('Confirmed Cases')
+plt.ylabel('Recovered Cases')
+plt.show()
+# Group Analysis: Average confirmed cases by WHO Region
+region_confirmed = df.groupby('who_region')['confirmed'].mean().sort_values()
+region_confirmed.plot(kind='bar', figsize=(10, 6), color='skyblue')
+plt.title('Average Confirmed Cases by WHO Region')
+plt.xlabel('WHO Region')
+plt.ylabel('Average Confirmed Cases')
+plt.xticks(rotation=45)
+plt.show()
+
+# Group Analysis: Average deaths per 100 cases by WHO Region
+region_deaths = df.groupby('who_region')['deaths___100_cases'].mean().sort_values()
+region_deaths.plot(kind='bar', figsize=(10, 6), color='salmon')
+plt.title('Average Deaths per 100 Cases by WHO Region')
+plt.xlabel('WHO Region')
+plt.ylabel('Average Deaths per 100 Cases')
+plt.xticks(rotation=45)
+plt.show()
+# Top 10 Countries with the Largest Weekly Increases
+top_weekly_increase = df.nlargest(10, '1_week_%_increase')[['country_region', '1_week_change', '1_week_%_increase']]
+print("Top 10 Countries with the Largest Weekly Increases:")
+print(top_weekly_increase)
+
+# Weekly Trends Visualization
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Scatter Plot: Weekly Change vs Percentage Increase
+plt.figure(figsize=(10, 6))
+sns.scatterplot(x='1_week_change', y='1_week_%_increase', data=df, hue='who_region', alpha=0.7)
+plt.title('Weekly Change vs Percentage Increase')
+plt.xlabel('1 Week Change')
+plt.ylabel('1 Week % Increase')
+plt.legend(title='WHO Region', bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.show()
+import matplotlib.pyplot as plt
+
+# Average Confirmed Cases by WHO Region
+region_confirmed = df.groupby('who_region')['confirmed'].mean().sort_values()
+region_confirmed.plot(kind='bar', figsize=(10, 6), color='skyblue')
+plt.title('Average Confirmed Cases by WHO Region')
+plt.xlabel('WHO Region')
+plt.ylabel('Average Confirmed Cases')
+plt.xticks(rotation=45)
+plt.show()
+
+# Average Deaths per 100 Cases by WHO Region
+region_deaths = df.groupby('who_region')['deaths___100_cases'].mean().sort_values()
+region_deaths.plot(kind='bar', figsize=(10, 6), color='salmon')
+plt.title('Average Deaths per 100 Cases by WHO Region')
+plt.xlabel('WHO Region')
+plt.ylabel('Average Deaths per 100 Cases')
+plt.xticks(rotation=45)
+plt.show()
+
+# Average Recovery Rate per 100 Cases by WHO Region
+region_recovery = df.groupby('who_region')['recovered___100_cases'].mean().sort_values()
+region_recovery.plot(kind='bar', figsize=(10, 6), color='green')
+plt.title('Average Recovery Rate by WHO Region')
+plt.xlabel('WHO Region')
+plt.ylabel('Average Recovery Rate')
+plt.xticks(rotation=45)
+plt.show()
+# Top 10 Countries by Confirmed Cases
+top_confirmed = df.nlargest(10, 'confirmed')[['country_region', 'confirmed', 'deaths', 'recovered', 'active']]
+print("Top 10 Countries by Confirmed Cases:")
+print(top_confirmed)
+
+# Top 10 Countries by Deaths
+top_deaths = df.nlargest(10, 'deaths')[['country_region', 'confirmed', 'deaths', 'recovered', 'active']]
+print("\nTop 10 Countries by Deaths:")
+print(top_deaths)
+# Filter data for specific countries (replace with your selection)
+countries_of_interest = ['US', 'India', 'Brazil', 'Russia', 'South Africa']
+df_filtered = df[df['country_region'].isin(countries_of_interest)]
+
+# Plot Confirmed Cases for Selected Countries
+plt.figure(figsize=(10, 6))
+sns.barplot(x='country_region', y='confirmed', data=df_filtered, palette='Blues_d')
+plt.title('Confirmed Cases for Selected Countries')
+plt.xlabel('Country')
+plt.ylabel('Confirmed Cases')
+plt.xticks(rotation=45)
+plt.show()
+
+# Plot Deaths per 100 Cases for Selected Countries
+plt.figure(figsize=(10, 6))
+sns.barplot(x='country_region', y='deaths___100_cases', data=df_filtered, palette='Reds_d')
+plt.title('Deaths per 100 Cases for Selected Countries')
+plt.xlabel('Country')
+plt.ylabel('Deaths per 100 Cases')
+plt.xticks(rotation=45)
+plt.show()
+
+# Plot Recovery Rate per 100 Cases for Selected Countries
+plt.figure(figsize=(10, 6))
+sns.barplot(x='country_region', y='recovered___100_cases', data=df_filtered, palette='Greens_d')
+plt.title('Recovery Rate per 100 Cases for Selected Countries')
+plt.xlabel('Country')
+plt.ylabel('Recovery Rate per 100 Cases')
+plt.xticks(rotation=45)
+plt.show()
+# Filter for countries of interest (replace with your selected countries)
+countries_of_interest = ['US', 'India', 'Brazil', 'South Africa', 'Russia']
+df_filtered = df[df['country_region'].isin(countries_of_interest)]
+
+# Simulate time series for 1_week_change
+plt.figure(figsize=(12, 6))
+sns.lineplot(data=df_filtered, x='country_region', y='1_week_change', hue='country_region', marker='o')
+plt.title('Weekly Change in Cases for Selected Countries')
+plt.xlabel('Country')
+plt.ylabel('1 Week Change')
+plt.legend(title='Country')
+plt.xticks(rotation=45)
+plt.show()
+
+# Simulate time series for 1_week_%_increase
+plt.figure(figsize=(12, 6))
+sns.lineplot(data=df_filtered, x='country_region', y='1_week_%_increase', hue='country_region', marker='o', palette='Set2')
+plt.title('Weekly Percentage Increase in Cases for Selected Countries')
+plt.xlabel('Country')
+plt.ylabel('1 Week % Increase')
+plt.legend(title='Country')
+plt.xticks(rotation=45)
+plt.show()
